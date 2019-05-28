@@ -1,0 +1,20 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# local
+admin/**/*.json
+models/seed/snowplow-main.local.json
+models/seed/snowplow-data.local.json
+
+# tmp
+/tmp/*
+
+# keep empty directories
+!.gitkeep
+
+# office
+~$*

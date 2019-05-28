@@ -1,0 +1,253 @@
+service: bookshop-api
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  
+custom:
+  defaultStage: dev
+  environment: ${file(./config/env.json)}
+  prune:
+    automatic: true
+    number: 3
+  dynamodb:
+    start:
+      migrate: true
+      seed: true
+    seed:
+      bookshop:
+        sources:
+          - table: bookshop-${self:provider.stage}-main
+            sources:
+              - ./models/seed/bookshop.json
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, self:custom.defaultStage}
+  region: ap-northeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:ap-northeast-1:210389843340:table/bookshop-*"
+  environment:
+    STAGE: ${self:provider.stage}
+    IS_LOCAL: ${self:custom.environment.${self:provider.stage}.IS_LOCAL}
+
+resources:
+  Resources:
+    bookshopDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: author_id
+            AttributeType: S
+          - AttributeName: genre_id
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
+        TableName: bookshop-${self:provider.stage}-main
+        GlobalSecondaryIndexes:
+          - IndexName: bookshop-main-gsi-5
+            KeySchema:
+              - AttributeName: genre_id
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
+          - IndexName: bookshop-main-gsi-4
+            KeySchema:
+              - AttributeName: author_id
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
+          - IndexName: bookshop-main-gsi-3
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
+          - IndexName: bookshop-main-gsi-2
+            KeySchema:
+              - AttributeName: SK
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
+          - IndexName: bookshop-main-gsi-1
+            KeySchema:
+              - AttributeName: name
+                KeyType: HASH
+              - AttributeName: SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
+          
+functions:
+  callFunction:
+    handler: handler.callHandler
+    events:
+      - http:
+          path: user/signup
+          method: post
+          cors: true
+      - http:
+          path: user/{userId}
+          method: get
+          cors: true
+      - http:
+          path: user/login
+          method: post
+          cors: true
+      - http:
+          path: user/logout
+          method: post
+          cors: true
+      
+      - http:
+          path: author
+          method: get
+          cors: true
+      - http:
+          path: author
+          method: post
+          cors: true
+      - http:
+          path: author/{authorId}
+          method: put
+          cors: true
+      - http:
+          path: author/{authorId}
+          method: delete
+          cors: true
+      - http:
+          path: author/{authorId}
+          method: get
+          cors: true
+      - http:
+          path: authorByName
+          method: post
+          cors: true
+
+      - http:
+          path: genre
+          method: get
+          cors: true
+      - http:
+          path: genre
+          method: post
+          cors: true
+      - http:
+          path: genre/{genreId}
+          method: put
+          cors: true
+      - http:
+          path: genre/{genreId}
+          method: delete
+          cors: true
+      - http:
+          path: genre/{genreId}
+          method: get
+          cors: true
+      - http:
+          path: genreByName
+          method: post
+          cors: true
+
+      - http:
+          path: book
+          method: get
+          cors: true
+      - http:
+          path: book
+          method: post
+          cors: true
+      - http:
+          path: book/{bookId}
+          method: put
+          cors: true
+      - http:
+          path: book/{bookId}
+          method: delete
+          cors: true
+      - http:
+          path: book/{bookId}
+          method: get
+          cors: true
+      - http:
+          path: bookByName
+          method: post
+          cors: true
+    
+
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
