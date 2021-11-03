@@ -38,7 +38,7 @@
     "request": "^2.88.0",
     "serverless": "^1.42.2",
     "serverless-offline": "^4.10.0",
-    "validator": "^10.5.0",
+    "validator": "^13.7.0",
     "voilab-pdf-table": "^0.4.1",
     "wkhtmltopdf": "^0.3.4",
     "xml2js": "^0.4.19"
